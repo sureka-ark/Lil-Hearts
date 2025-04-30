@@ -1,0 +1,712 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <description>Add slack image</description>
+        <name>Attach_image_slack</name>
+        <label>Attach image slack</label>
+        <locationX>138</locationX>
+        <locationY>1622</locationY>
+        <actionName>PostSlackMessage</actionName>
+        <actionType>apex</actionType>
+        <connector>
+            <targetReference>Post_slack_image</targetReference>
+        </connector>
+        <faultConnector>
+            <isGoTo>true</isGoTo>
+            <targetReference>Error_Screen</targetReference>
+        </faultConnector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>contentdocumentid</name>
+            <value>
+                <elementReference>Post_slack_image</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>PostSlackMessage</nameSegment>
+        <offset>0</offset>
+    </actionCalls>
+    <actionCalls>
+        <description>Upload Image to google</description>
+        <name>Image_Processing_API_Class</name>
+        <label>Image Processing API Class</label>
+        <locationX>618</locationX>
+        <locationY>1298</locationY>
+        <actionName>ImageProcessLogic</actionName>
+        <actionType>apex</actionType>
+        <connector>
+            <targetReference>Update_ContentDoc</targetReference>
+        </connector>
+        <flowTransactionModel>Automatic</flowTransactionModel>
+        <inputParameters>
+            <name>ids</name>
+            <value>
+                <elementReference>Get_MP_Records.Id</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>ImageProcessLogic</nameSegment>
+        <offset>0</offset>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </actionCalls>
+    <actionCalls>
+        <description>Send Message to Slack</description>
+        <name>Send_Message_to_Slack</name>
+        <label>Send Message to Slack</label>
+        <locationX>50</locationX>
+        <locationY>1406</locationY>
+        <actionName>slackPostMessage</actionName>
+        <actionType>slackPostMessage</actionType>
+        <connector>
+            <targetReference>Post_slack_image</targetReference>
+        </connector>
+        <flowTransactionModel>Automatic</flowTransactionModel>
+        <inputParameters>
+            <name>slackAppIdForToken</name>
+            <value>
+                <stringValue>A01RDL2NJAH</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>slackWorkspaceIdForToken</name>
+            <value>
+                <stringValue>T08HCF8ERQR</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>slackConversationId</name>
+            <value>
+                <stringValue>C08HCF8R2RX</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>slackMessage</name>
+            <value>
+                <stringValue>005dL00000Gelz6QAB</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>viewApiName</name>
+            <value>
+                <stringValue>swarming__swarm_message</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>recordId</name>
+            <value>
+                <elementReference>Create_Swarm</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>slackPostMessage</nameSegment>
+        <offset>0</offset>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </actionCalls>
+    <apiVersion>63.0</apiVersion>
+    <assignments>
+        <description>Add content doc ids</description>
+        <name>Add_Content_Document_Ids</name>
+        <label>Add Content Document Ids</label>
+        <locationX>334</locationX>
+        <locationY>1082</locationY>
+        <assignmentItems>
+            <assignToReference>ContentDocumentIds</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>UploadFile.contentDocIds</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Case_Or_Prescription</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Assignment of MP record</description>
+        <name>Mp_Record</name>
+        <label>Mp Record</label>
+        <locationX>598</locationX>
+        <locationY>782</locationY>
+        <assignmentItems>
+            <assignToReference>MpRecordList</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>CaseOrMP</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Upload_An_Image</targetReference>
+        </connector>
+    </assignments>
+    <choices>
+        <description>Choice for image upload</description>
+        <name>Upload_Image_for_CASE</name>
+        <choiceText>&lt;span style=&quot;color: rgb(68, 68, 68); background-color: rgb(255, 255, 255);&quot;&gt;Upload Image for CASE&lt;/span&gt;</choiceText>
+        <dataType>String</dataType>
+        <value>
+            <stringValue>Upload Image for CASE</stringValue>
+        </value>
+    </choices>
+    <choices>
+        <description>Choice for medical prescription</description>
+        <name>Upload_Image_for_MEDICAL_PRESCRIPTION</name>
+        <choiceText>&lt;span style=&quot;background-color: rgb(255, 255, 255); color: rgb(68, 68, 68);&quot;&gt;Upload Image for MEDICAL PRESCRIPTION&lt;/span&gt;</choiceText>
+        <dataType>String</dataType>
+        <value>
+            <stringValue>Upload Image for MEDICAL PRESCRIPTION</stringValue>
+        </value>
+    </choices>
+    <decisions>
+        <description>Case or MP decision</description>
+        <name>Case_or_MP</name>
+        <label>Case or MP</label>
+        <locationX>334</locationX>
+        <locationY>566</locationY>
+        <defaultConnector>
+            <targetReference>Get_MP_Records</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Case</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Select_Option</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Upload Image for CASE</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_Case</targetReference>
+            </connector>
+            <label>Case</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Find Case or MP</description>
+        <name>Case_Or_Prescription</name>
+        <label>Case Or Prescription</label>
+        <locationX>334</locationX>
+        <locationY>1190</locationY>
+        <defaultConnector>
+            <targetReference>Image_Processing_API_Class</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Case_Path</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Select_Option</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Upload Image for CASE</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Create_Swarm</targetReference>
+            </connector>
+            <label>Case</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Check if user exists or not</description>
+        <name>Check_Count</name>
+        <label>Check Count</label>
+        <locationX>730</locationX>
+        <locationY>350</locationY>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Outcome_1_of_Check_Count</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_LH_Customer.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Choose_type</targetReference>
+            </connector>
+            <label>Outcome 1 of Check Count</label>
+        </rules>
+    </decisions>
+    <description>Upload image screen flow</description>
+    <environments>Default</environments>
+    <formulas>
+        <description>Find case or MP</description>
+        <name>CaseOrMP</name>
+        <dataType>String</dataType>
+        <expression>IF({!Case}, {!Get_Case.Id}, {!Get_MP_Records.Id})</expression>
+    </formulas>
+    <formulas>
+        <description>Formula to find rthe link</description>
+        <name>ImageAddedTo</name>
+        <dataType>String</dataType>
+        <expression>IF({!Case}, &apos;Case&apos;, &apos;Medical Prescription&apos;)</expression>
+    </formulas>
+    <interviewLabel>Upload Image {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Upload Image</label>
+    <loops>
+        <description>Send slack message</description>
+        <name>Post_slack_image</name>
+        <label>Post slack image</label>
+        <locationX>50</locationX>
+        <locationY>1514</locationY>
+        <collectionReference>UploadFile.contentDocIds</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Attach_image_slack</targetReference>
+        </nextValueConnector>
+    </loops>
+    <loops>
+        <description>Update content doc val</description>
+        <name>Update_ContentDoc</name>
+        <label>Update ContentDoc</label>
+        <locationX>618</locationX>
+        <locationY>1406</locationY>
+        <collectionReference>UploadFile.contentDocIds</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Update_Medical_Prescription</targetReference>
+        </nextValueConnector>
+    </loops>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>Flow</processType>
+    <recordCreates>
+        <description>create Swarm record</description>
+        <name>Create_Swarm</name>
+        <label>Create Swarm</label>
+        <locationX>50</locationX>
+        <locationY>1298</locationY>
+        <connector>
+            <targetReference>Send_Message_to_Slack</targetReference>
+        </connector>
+        <inputAssignments>
+            <field>CollaborationTool</field>
+            <value>
+                <stringValue>Slack</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>CollaborationUrl</field>
+            <value>
+                <stringValue>https://app.slack.com/client/T08HCF8ERQR/C08HCF8R2RX</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>HelpNeeded</field>
+            <value>
+                <stringValue>Hi Team, please prioritize this Case!!</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Name</field>
+            <value>
+                <stringValue>Swarm Group</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>OwnerId</field>
+            <value>
+                <stringValue>005dL00000Gelz6QAB</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>RelatedRecordId</field>
+            <value>
+                <elementReference>CaseOrMP</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>StartedDateTime</field>
+            <value>
+                <elementReference>$Flow.CurrentDateTime</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status</field>
+            <value>
+                <stringValue>In Progress</stringValue>
+            </value>
+        </inputAssignments>
+        <object>Swarm</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordCreates>
+    <recordLookups>
+        <description>Get case records</description>
+        <name>Get_Case</name>
+        <label>Get Case</label>
+        <locationX>70</locationX>
+        <locationY>674</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Upload_An_Image</targetReference>
+        </connector>
+        <faultConnector>
+            <isGoTo>true</isGoTo>
+            <targetReference>Error_Screen</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Subject</field>
+            <operator>StartsWith</operator>
+            <value>
+                <stringValue>IQ</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>LH_Customer__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Get_LH_Customer.Id</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>CaseNumber</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Enter_Case_Number</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Case</object>
+        <sortField>CreatedDate</sortField>
+        <sortOrder>Desc</sortOrder>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Get Customer records</description>
+        <name>Get_LH_Customer</name>
+        <label>Get LH Customer</label>
+        <locationX>730</locationX>
+        <locationY>242</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Check_Count</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Error_Screen</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Email__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>userEmail.value</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Customer__c</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Get Mp records</description>
+        <name>Get_MP_Records</name>
+        <label>Get MP Records</label>
+        <locationX>598</locationX>
+        <locationY>674</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Mp_Record</targetReference>
+        </connector>
+        <faultConnector>
+            <isGoTo>true</isGoTo>
+            <targetReference>Error_Screen</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>LH_Customer__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Get_LH_Customer.Id</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Name</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Enter_Medical_Prescription_Number</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Order_Created__c</field>
+            <operator>NotEqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Medical_Prescription__c</object>
+        <sortField>CreatedDate</sortField>
+        <sortOrder>Desc</sortOrder>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordUpdates>
+        <description>Update Medical Prescription</description>
+        <name>Update_Medical_Prescription</name>
+        <label>Update Medical Prescription</label>
+        <locationX>706</locationX>
+        <locationY>1514</locationY>
+        <connector>
+            <targetReference>Update_ContentDoc</targetReference>
+        </connector>
+        <faultConnector>
+            <isGoTo>true</isGoTo>
+            <targetReference>Error_Screen</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>CaseOrMP</elementReference>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>ContentVersionLink__c</field>
+            <value>
+                <elementReference>Update_ContentDoc</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Medical_Prescription__c</object>
+    </recordUpdates>
+    <runInMode>SystemModeWithoutSharing</runInMode>
+    <screens>
+        <description>Choose the type of flow</description>
+        <name>Choose_type</name>
+        <label>Choose type</label>
+        <locationX>334</locationX>
+        <locationY>458</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <targetReference>Case_or_MP</targetReference>
+        </connector>
+        <fields>
+            <name>Select_Option</name>
+            <choiceReferences>Upload_Image_for_CASE</choiceReferences>
+            <choiceReferences>Upload_Image_for_MEDICAL_PRESCRIPTION</choiceReferences>
+            <dataType>String</dataType>
+            <fieldText>Select Option</fieldText>
+            <fieldType>RadioButtons</fieldType>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>true</isRequired>
+        </fields>
+        <fields>
+            <name>Enter_Case_Number</name>
+            <dataType>String</dataType>
+            <fieldText>Enter Case Number</fieldText>
+            <fieldType>InputField</fieldType>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>true</isRequired>
+            <visibilityRule>
+                <conditionLogic>and</conditionLogic>
+                <conditions>
+                    <leftValueReference>Select_Option</leftValueReference>
+                    <operator>EqualTo</operator>
+                    <rightValue>
+                        <stringValue>Upload Image for CASE</stringValue>
+                    </rightValue>
+                </conditions>
+            </visibilityRule>
+        </fields>
+        <fields>
+            <name>Enter_Medical_Prescription_Number</name>
+            <dataType>String</dataType>
+            <fieldText>Enter Medical Prescription Number</fieldText>
+            <fieldType>InputField</fieldType>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>true</isRequired>
+            <visibilityRule>
+                <conditionLogic>and</conditionLogic>
+                <conditions>
+                    <leftValueReference>Select_Option</leftValueReference>
+                    <operator>EqualTo</operator>
+                    <rightValue>
+                        <stringValue>Upload Image for MEDICAL PRESCRIPTION</stringValue>
+                    </rightValue>
+                </conditions>
+            </visibilityRule>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <screens>
+        <description>Error screen</description>
+        <name>Error_Screen</name>
+        <label>Error Screen</label>
+        <locationX>1390</locationX>
+        <locationY>350</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>true</allowPause>
+        <fields>
+            <name>Error_Screen_Display</name>
+            <fieldText>&lt;p&gt;An error has occurred while fetching the records, please verify the entered values once.&lt;/p&gt;&lt;p&gt;{!$Flow.FaultMessage}&lt;/p&gt;&lt;p&gt;&lt;strong&gt;Whoof, It happens 🐶&lt;/strong&gt;&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <screens>
+        <description>Screen to get user email</description>
+        <name>Get_User_Email</name>
+        <label>Get User Email</label>
+        <locationX>730</locationX>
+        <locationY>134</locationY>
+        <allowBack>false</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <targetReference>Get_LH_Customer</targetReference>
+        </connector>
+        <fields>
+            <name>userEmail</name>
+            <extensionName>flowruntime:email</extensionName>
+            <fieldType>ComponentInstance</fieldType>
+            <inputParameters>
+                <name>label</name>
+                <value>
+                    <stringValue>Enter your Email</stringValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>required</name>
+                <value>
+                    <booleanValue>true</booleanValue>
+                </value>
+            </inputParameters>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>true</isRequired>
+            <storeOutputAutomatically>true</storeOutputAutomatically>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <screens>
+        <description>Lets user to upoad the image</description>
+        <name>Upload_An_Image</name>
+        <label>Upload An Image</label>
+        <locationX>334</locationX>
+        <locationY>974</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <targetReference>Add_Content_Document_Ids</targetReference>
+        </connector>
+        <fields>
+            <name>UploadFile</name>
+            <extensionName>forceContent:fileUpload</extensionName>
+            <fieldType>ComponentInstance</fieldType>
+            <inputParameters>
+                <name>label</name>
+                <value>
+                    <stringValue>Upload your image here (max. 2MB)</stringValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>accept</name>
+                <value>
+                    <stringValue>.jpg,.jpeg,.png</stringValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>multiple</name>
+                <value>
+                    <booleanValue>false</booleanValue>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>contentDocIds</name>
+                <value>
+                    <elementReference>UploadFile.contentDocIds</elementReference>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>contentVersionIds</name>
+                <value>
+                    <elementReference>UploadFile.contentVersionIds</elementReference>
+                </value>
+            </inputParameters>
+            <inputParameters>
+                <name>recordId</name>
+                <value>
+                    <elementReference>CaseOrMP</elementReference>
+                </value>
+            </inputParameters>
+            <inputsOnNextNavToAssocScrn>UseStoredValues</inputsOnNextNavToAssocScrn>
+            <isRequired>true</isRequired>
+            <storeOutputAutomatically>true</storeOutputAutomatically>
+        </fields>
+        <fields>
+            <name>deete</name>
+            <fieldText>&lt;p&gt;&lt;strong style=&quot;color: rgb(68, 68, 68); background-color: rgb(255, 255, 255); font-size: 14px;&quot;&gt;✅&lt;/strong&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;Image added to your&lt;/span&gt;&lt;strong style=&quot;font-size: 14px; color: rgb(0, 0, 0);&quot;&gt; &lt;/strong&gt;&lt;strong style=&quot;font-size: 14px; color: rgb(68, 68, 68); background-color: rgb(255, 255, 255);&quot;&gt;{!ImageAddedTo} &lt;/strong&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;Please continue your chat with our Agent.&lt;/span&gt;&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+            <visibilityRule>
+                <conditionLogic>and</conditionLogic>
+                <conditions>
+                    <leftValueReference>UploadFile.contentDocIds</leftValueReference>
+                    <operator>NotEqualTo</operator>
+                </conditions>
+            </visibilityRule>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>false</showHeader>
+    </screens>
+    <start>
+        <locationX>604</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_User_Email</targetReference>
+        </connector>
+    </start>
+    <status>Active</status>
+    <variables>
+        <description>Content documetn ids</description>
+        <name>ContentDocumentIds</name>
+        <dataType>String</dataType>
+        <isCollection>true</isCollection>
+        <isInput>true</isInput>
+        <isOutput>true</isOutput>
+    </variables>
+    <variables>
+        <description>Send the list of MP records</description>
+        <name>MpRecordList</name>
+        <dataType>String</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>true</isOutput>
+    </variables>
+    <variables>
+        <description>Reference of the record</description>
+        <name>RecordReference</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>Email of the user</description>
+        <name>UserEmailString</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>

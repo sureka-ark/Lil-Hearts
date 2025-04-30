@@ -1,0 +1,17 @@
+<template>
+    <div class={generateMessageBubbleClassname}>
+      <lightning-formatted-rich-text value={textContent}></lightning-formatted-rich-text>
+    </div>
+    <template if:true={hideGraph}>
+    <br/>
+    <c-doctor-feedback-chart vetname={sendDocName}></c-doctor-feedback-chart>
+    </template>
+    <template if:true={showButton}>
+    <br/>
+    <lightning-button label="Copy Number & Upload" onclick = {UploadfromFlow}></lightning-button>
+    <!--<lightning-flow
+      flow-api-name ={flowName}
+      flow-input-variables={inputVariables}
+      onstatuschange={handleStatusChange}></lightning-flow>-->
+    </template>
+ </template>

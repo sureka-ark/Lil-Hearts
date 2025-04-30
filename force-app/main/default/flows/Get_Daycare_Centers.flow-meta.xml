@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <description>Find the nearest day care center</description>
+        <name>Nearest_Daycare_Action_1</name>
+        <label>Nearest Daycare Action 1</label>
+        <locationX>50</locationX>
+        <locationY>866</locationY>
+        <actionName>0hfdL00000CtPLRNotFound</actionName>
+        <actionType>generatePromptResponse</actionType>
+        <connector>
+            <targetReference>Get_Final_Record</targetReference>
+        </connector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>Input:User_Location</name>
+            <value>
+                <elementReference>CustomerLocationString</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>Input:Location_String</name>
+            <value>
+                <elementReference>DaycareLocationString</elementReference>
+            </value>
+        </inputParameters>
+        <offset>0</offset>
+        <outputParameters>
+            <assignToReference>PromptOutput</assignToReference>
+            <name>promptResponse</name>
+        </outputParameters>
+    </actionCalls>
+    <apiVersion>63.0</apiVersion>
+    <assignments>
+        <description>Flatten the strings</description>
+        <name>FlattenLocation</name>
+        <label>FlattenLocation</label>
+        <locationX>138</locationX>
+        <locationY>674</locationY>
+        <assignmentItems>
+            <assignToReference>DaycareLocationString</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>Daycare_For.TECH_Location__c</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>DaycareLocationString</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <stringValue>;</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Daycare_For</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Fault path</description>
+        <name>No_Daycare_Centers</name>
+        <label>No Daycare Centers</label>
+        <locationX>314</locationX>
+        <locationY>566</locationY>
+        <assignmentItems>
+            <assignToReference>PromptOutput</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <stringValue>We couldn&apos;t find any matching daycare centers.</stringValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <description>No user found fault path</description>
+        <name>No_User_Found</name>
+        <label>No User Found</label>
+        <locationX>1370</locationX>
+        <locationY>242</locationY>
+        <assignmentItems>
+            <assignToReference>PromptOutput</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>We could&apos;nt find any matching Customers in our Facility.</stringValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <description>Condition to check if the customer exists</description>
+        <name>Check_if_Customer_exists</name>
+        <label>Check if Customer exists</label>
+        <locationX>710</locationX>
+        <locationY>242</locationY>
+        <defaultConnector>
+            <isGoTo>true</isGoTo>
+            <targetReference>No_User_Found</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Yes</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Customer_Record.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Nearest_or_not</targetReference>
+            </connector>
+            <label>Yes</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Checks if its nearest or not</description>
+        <name>Nearest_or_not</name>
+        <label>Nearest or not</label>
+        <locationX>314</locationX>
+        <locationY>350</locationY>
+        <defaultConnector>
+            <targetReference>Get_All_Day_care_records</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Nearest</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>NearestOrNot</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>nearest</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_Daycare_Centers</targetReference>
+            </connector>
+            <label>Nearest</label>
+        </rules>
+    </decisions>
+    <description>Get Day care center flow</description>
+    <environments>Default</environments>
+    <formulas>
+        <description>Formula to calculate customer location as a string</description>
+        <name>CustomerLocationString</name>
+        <dataType>String</dataType>
+        <expression>TEXT({!Get_Customer_Record.Home_Location__Latitude__s})&amp; &apos;,&apos;&amp;TEXT({!Get_Customer_Record.Home_Location__Longitude__s})</expression>
+    </formulas>
+    <interviewLabel>Get Daycare Centers {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Get Daycare Centers</label>
+    <loops>
+        <description>Iterate through the day care centers</description>
+        <name>Daycare_For</name>
+        <label>Daycare For</label>
+        <locationX>50</locationX>
+        <locationY>566</locationY>
+        <collectionReference>DccRecords</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>FlattenLocation</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <targetReference>Nearest_Daycare_Action_1</targetReference>
+        </noMoreValuesConnector>
+    </loops>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>Get all the available day care records</description>
+        <name>Get_All_Day_care_records</name>
+        <label>Get All Day care records</label>
+        <locationX>578</locationX>
+        <locationY>458</locationY>
+        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+        <faultConnector>
+            <isGoTo>true</isGoTo>
+            <targetReference>No_Daycare_Centers</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Pet_Type__c</field>
+            <operator>Contains</operator>
+            <value>
+                <elementReference>PetName</elementReference>
+            </value>
+        </filters>
+        <object>Daycare_Center__c</object>
+        <outputReference>DccRecords</outputReference>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>Name</queriedFields>
+        <queriedFields>Operating_Time_From__c</queriedFields>
+        <queriedFields>Operating_Time_To__c</queriedFields>
+        <queriedFields>Address__c</queriedFields>
+    </recordLookups>
+    <recordLookups>
+        <description>Get customer record</description>
+        <name>Get_Customer_Record</name>
+        <label>Get Customer Record</label>
+        <locationX>710</locationX>
+        <locationY>134</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Check_if_Customer_exists</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>No_User_Found</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Email__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>CustomerEmail</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Customer__c</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>Email__c</queriedFields>
+        <queriedFields>Mobile_Phone__c</queriedFields>
+        <queriedFields>Home_Location__c</queriedFields>
+        <queriedFields>Home_Location__Latitude__s</queriedFields>
+        <queriedFields>Home_Location__Longitude__s</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Gets the daycare center records</description>
+        <name>Get_Daycare_Centers</name>
+        <label>Get Daycare Centers</label>
+        <locationX>50</locationX>
+        <locationY>458</locationY>
+        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Daycare_For</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>No_Daycare_Centers</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Pet_Type__c</field>
+            <operator>Contains</operator>
+            <value>
+                <elementReference>PetName</elementReference>
+            </value>
+        </filters>
+        <object>Daycare_Center__c</object>
+        <outputReference>DccRecords</outputReference>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>Name</queriedFields>
+        <queriedFields>Pet_Type__c</queriedFields>
+        <queriedFields>Operating_Time_From__c</queriedFields>
+        <queriedFields>Operating_Time_To__c</queriedFields>
+        <queriedFields>TECH_Location__c</queriedFields>
+    </recordLookups>
+    <recordLookups>
+        <description>Get the day care center post finding the closest record</description>
+        <name>Get_Final_Record</name>
+        <label>Get Final Record</label>
+        <locationX>50</locationX>
+        <locationY>974</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>TECH_Location__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>PromptOutput</elementReference>
+            </value>
+        </filters>
+        <object>Daycare_Center__c</object>
+        <outputReference>DaycareRecord</outputReference>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>Name</queriedFields>
+        <queriedFields>Phone__c</queriedFields>
+        <queriedFields>Address__c</queriedFields>
+        <queriedFields>Specialized_For__c</queriedFields>
+    </recordLookups>
+    <runInMode>SystemModeWithoutSharing</runInMode>
+    <start>
+        <locationX>584</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_Customer_Record</targetReference>
+        </connector>
+    </start>
+    <status>Active</status>
+    <variables>
+        <description>Customer email</description>
+        <name>CustomerEmail</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>Store Daycare center records</description>
+        <name>DaycareCenterRecords</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>true</isOutput>
+        <objectType>Daycare_Center__c</objectType>
+    </variables>
+    <variables>
+        <description>Location string of the daycare center</description>
+        <name>DaycareLocationString</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>Store each record</description>
+        <name>DaycareRecord</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>true</isOutput>
+        <objectType>Daycare_Center__c</objectType>
+    </variables>
+    <variables>
+        <description>Day care center records</description>
+        <name>DccRecords</name>
+        <dataType>SObject</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>true</isOutput>
+        <objectType>Daycare_Center__c</objectType>
+    </variables>
+    <variables>
+        <description>Checks if its nearest or not</description>
+        <name>NearestOrNot</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>Store the type of the pet</description>
+        <name>PetName</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>Store the prompt output from the prompt builder</description>
+        <name>PromptOutput</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>true</isOutput>
+    </variables>
+</Flow>

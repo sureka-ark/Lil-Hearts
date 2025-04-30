@@ -1,0 +1,25 @@
+:host {
+    display: block;
+  }
+ 
+  .Agent,
+  .Chatbot {
+    color: black;
+    background-color: #eceaea;
+    border-radius: 10px 10px 10px 0;
+    float: left;
+    padding: 0.5em;
+  }
+ 
+  .EndUser {
+    background-color: #f0c440;
+    color: rgb(255, 255, 255);
+    margin-left: auto;
+    padding: 0.5em;
+    border-radius: 10px 10px 0 10px;
+  }
+ 
+  lightning-formatted-text {
+    font-size: 0.875em;
+    font-family: sans-serif;
+  }

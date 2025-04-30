@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>63.0</apiVersion>
+    <assignments>
+        <description>Store the case nmber</description>
+        <name>CaseNumberPositive</name>
+        <label>CaseNumberPositive</label>
+        <locationX>176</locationX>
+        <locationY>350</locationY>
+        <assignmentItems>
+            <assignToReference>CaseNumber</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Record Created</stringValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <description>Fault path</description>
+        <name>Copy_2_of_CaseNumberPositive</name>
+        <label>Copy 2 of CaseNumberPositive</label>
+        <locationX>440</locationX>
+        <locationY>350</locationY>
+        <assignmentItems>
+            <assignToReference>CaseNumber</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Record Not created</stringValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <description>Fault path</description>
+        <name>Copy_3_of_CaseNumberPositive</name>
+        <label>Copy 3 of CaseNumberPositive</label>
+        <locationX>704</locationX>
+        <locationY>242</locationY>
+        <assignmentItems>
+            <assignToReference>CaseNumber</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>User not found</stringValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <description>Creates a case for the customer</description>
+    <environments>Default</environments>
+    <interviewLabel>Create IQ Case {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Create IQ Case</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordCreates>
+        <description>Creates a case for the customer</description>
+        <name>Create_Case</name>
+        <label>Create Case</label>
+        <locationX>176</locationX>
+        <locationY>242</locationY>
+        <connector>
+            <targetReference>CaseNumberPositive</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Copy_2_of_CaseNumberPositive</targetReference>
+        </faultConnector>
+        <inputAssignments>
+            <field>Description</field>
+            <value>
+                <elementReference>Customerproblemresource</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>LH_Customer__c</field>
+            <value>
+                <elementReference>Get_Customer.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Priority</field>
+            <value>
+                <stringValue>Critical</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Subject</field>
+            <value>
+                <stringValue>IQ - From Customer</stringValue>
+            </value>
+        </inputAssignments>
+        <object>Case</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordCreates>
+    <recordLookups>
+        <description>Gets customer record</description>
+        <name>Get_Customer</name>
+        <label>Get Customer</label>
+        <locationX>176</locationX>
+        <locationY>134</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Create_Case</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Copy_3_of_CaseNumberPositive</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Email__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>CustomerEmailResource</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Customer__c</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <runInMode>SystemModeWithoutSharing</runInMode>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Get_Customer</targetReference>
+        </connector>
+    </start>
+    <status>Active</status>
+    <variables>
+        <description>Outputs the case number</description>
+        <name>CaseNumber</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>true</isOutput>
+    </variables>
+    <variables>
+        <description>Stores customer email</description>
+        <name>CustomerEmailResource</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>Stores customer problem resource</description>
+        <name>Customerproblemresource</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>

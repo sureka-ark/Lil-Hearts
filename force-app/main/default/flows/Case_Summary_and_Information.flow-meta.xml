@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <description>Pass the case information to summarize the records</description>
+        <name>Case_Summary_Action</name>
+        <label>Case Summary Action</label>
+        <locationX>50</locationX>
+        <locationY>458</locationY>
+        <actionName>0hfdL00000Ct2CrNotFound</actionName>
+        <actionType>generatePromptResponse</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>Input:Case</name>
+            <value>
+                <elementReference>Get_Case</elementReference>
+            </value>
+        </inputParameters>
+        <offset>0</offset>
+        <outputParameters>
+            <assignToReference>SummaryResponse</assignToReference>
+            <name>promptResponse</name>
+        </outputParameters>
+    </actionCalls>
+    <apiVersion>63.0</apiVersion>
+    <assignments>
+        <description>Store the case record</description>
+        <name>Case_record</name>
+        <label>Case record</label>
+        <locationX>50</locationX>
+        <locationY>350</locationY>
+        <assignmentItems>
+            <assignToReference>CaseRecord</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Get_Case</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Case_Summary_Action</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Store fault path message</description>
+        <name>Copy_1_of_Fault</name>
+        <label>Copy 1 of Fault</label>
+        <locationX>1106</locationX>
+        <locationY>350</locationY>
+        <assignmentItems>
+            <assignToReference>SummaryResponse</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Error in fetching the Customer records.</stringValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <description>Store Fault path message</description>
+        <name>Copy_2_of_Fault</name>
+        <label>Copy 2 of Fault</label>
+        <locationX>314</locationX>
+        <locationY>350</locationY>
+        <assignmentItems>
+            <assignToReference>SummaryResponse</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Error in fetching the records.</stringValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <description>Store fault path message</description>
+        <name>Fault</name>
+        <label>Fault</label>
+        <locationX>842</locationX>
+        <locationY>458</locationY>
+        <assignmentItems>
+            <assignToReference>SummaryResponse</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Error in fetching the records.</stringValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <description>To classify if the case number is present or not.</description>
+        <name>Case_Number_or_All</name>
+        <label>Case Number or All</label>
+        <locationX>314</locationX>
+        <locationY>134</locationY>
+        <defaultConnector>
+            <targetReference>Get_Customer</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>If_its_the_case_number</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>CaseNumber</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_Case</targetReference>
+            </connector>
+            <label>If its the case number</label>
+        </rules>
+    </decisions>
+    <description>Retrieve Case summary and information</description>
+    <environments>Default</environments>
+    <interviewLabel>Case Summary and Information {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Case Summary and Information</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>Fetches all the open cases</description>
+        <name>Get_All_Open_Cases</name>
+        <label>Get All Open Cases</label>
+        <locationX>578</locationX>
+        <locationY>350</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <faultConnector>
+            <targetReference>Fault</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Status</field>
+            <operator>NotEqualTo</operator>
+            <value>
+                <stringValue>Closed</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>LH_Customer__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Get_Customer.Id</elementReference>
+            </value>
+        </filters>
+        <object>Case</object>
+        <outputReference>AllCasesRecord</outputReference>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>CaseNumber</queriedFields>
+        <queriedFields>Priority</queriedFields>
+        <queriedFields>Status</queriedFields>
+        <queriedFields>Subject</queriedFields>
+        <queriedFields>Description</queriedFields>
+        <queriedFields>CreatedDate</queriedFields>
+        <queriedFields>Case_Feedback__c</queriedFields>
+    </recordLookups>
+    <recordLookups>
+        <description>To get the case record</description>
+        <name>Get_Case</name>
+        <label>Get Case</label>
+        <locationX>50</locationX>
+        <locationY>242</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Case_record</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Copy_2_of_Fault</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>CaseNumber</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>CaseNumber</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Case</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Gets the customer record based on the email.</description>
+        <name>Get_Customer</name>
+        <label>Get Customer</label>
+        <locationX>578</locationX>
+        <locationY>242</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Get_All_Open_Cases</targetReference>
+        </connector>
+        <faultConnector>
+            <targetReference>Copy_1_of_Fault</targetReference>
+        </faultConnector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Email__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>CustomerEmail</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Customer__c</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <runInMode>SystemModeWithoutSharing</runInMode>
+    <start>
+        <locationX>188</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Case_Number_or_All</targetReference>
+        </connector>
+    </start>
+    <status>Active</status>
+    <variables>
+        <description>Store All case records</description>
+        <name>AllCasesRecord</name>
+        <dataType>SObject</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>true</isOutput>
+        <objectType>Case</objectType>
+    </variables>
+    <variables>
+        <description>To Store Case Number</description>
+        <name>CaseNumber</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>To store the case record</description>
+        <name>CaseRecord</name>
+        <dataType>SObject</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+        <objectType>Case</objectType>
+    </variables>
+    <variables>
+        <description>To Store Customer Email</description>
+        <name>CustomerEmail</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>To pass the summary of the case record</description>
+        <name>SummaryResponse</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>true</isOutput>
+    </variables>
+</Flow>
