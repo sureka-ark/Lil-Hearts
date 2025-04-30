@@ -53,7 +53,7 @@ export default class CustomChatComponent extends LightningElement {
 
   UploadfromFlow(event) {
 
-    const url = 'https://in1740112455558.my.salesforce.com/flow/Upload_Pet_Image';
+    const url = 'https://orgfarm-aa51fef306.my.salesforce.com/flow/Upload_Pet_Image';
 
     navigator.clipboard.writeText(this.recordref)
       .then(() => {
