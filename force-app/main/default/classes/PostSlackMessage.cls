@@ -18,7 +18,7 @@ public without sharing class PostSlackMessage {
         HttpRequest req = new HttpRequest();
         req.setEndpoint(endpoint);
         req.setMethod('POST');
-        req.setHeader('Authorization', 'Bearer ' + 'xoxp-8590518501841-8590518501969-8570990526327-472dd8a6013340be1a90c75a7e7d6cce'); //sorry :-(
+        req.setHeader('Authorization', 'Bearer ' + ''); //sorry :-(
         req.setHeader('Content-Type', 'application/x-www-form-urlencoded');
 
 
@@ -102,7 +102,7 @@ public without sharing class PostSlackMessage {
         HttpRequest req = new HttpRequest();
         req.setEndpoint(endpoint);
         req.setMethod('POST');
-        req.setHeader('Authorization', 'Bearer ' + 'xoxp-8590518501841-8590518501969-8570990526327-472dd8a6013340be1a90c75a7e7d6cce');
+        req.setHeader('Authorization', 'Bearer ' + '');
         req.setHeader('Content-Type', 'application/json');
 
 

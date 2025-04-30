@@ -17,8 +17,8 @@ public without sharing class CallVisionAPI {
         req.setEndpoint('https://vision.googleapis.com/v1/images:annotate'); // Try to migrate the endpoint to Named credential
         req.setMethod('POST');
         req.setHeader('Content-Type', 'application/json');
-     	req.setHeader('x-api-key','407fed71321f28f96690fb40b1113076e0c11976');
-     	req.setHeader('Authorization','Bearer ya29.a0AeXRPp4lSeq8YmBpTJLkYvDvp3ZSa8AfApC27YA7JVMYyPHwD902-VuTC4YTFMUEXCf_dBrdHX_OaoDDYRHYQYif_S3yHpY3o59ChHErOLWg771OdsW5GrYtcCklcuheMVEMWFUHg2-v60azyIBErCWIhpKOvMQOxs8xtLWzAihrQdsaCgYKAYQSARESFQHGX2MimllOWFIrDeenNaBoAGF8HA0182');
+     	req.setHeader('x-api-key','');
+     	req.setHeader('Authorization','Bearer ya29.');
         req.setBody(requestBody);
 
         // Send the request
